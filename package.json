@@ -1,0 +1,32 @@
+{
+  "name": "firebase-web",
+  "version": "1.0.0",
+  "description": "web application using node and firebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Danushka2/firebase-web.git"
+  },
+  "keywords": [
+    "firebase",
+    "web",
+    "node"
+  ],
+  "author": "Danushka",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Danushka2/firebase-web/issues"
+  },
+  "homepage": "https://github.com/Danushka2/firebase-web#readme",
+  "dependencies": {
+    "firebase": "^7.6.2",
+    "firebase-admin": "^8.9.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
