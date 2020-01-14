@@ -17,7 +17,7 @@
   <div class="container" id="container">
 
     <div class="form-container sign-up-container">
-      <form action="#">
+      <form action="/users" method="POST">
         <h1>Create Account</h1>
         <div>
           <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -25,10 +25,10 @@
           <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
         </div>
         <span>or use your email for registration</span>
-        <input type="text" class="form-control" placeholder="Name" />
-        <input type="email" class="form-control" placeholder="Email" />
-        <input type="password" class="form-control" placeholder="Password" />
-        <button>Sign Up</button>
+        <input type="text" class="form-control" name="nameF" placeholder="Name" />
+        <input type="email" class="form-control" name="emailF" placeholder="Email" />
+        <input type="password" class="form-control" name="passwordF" placeholder="Password" />
+        <button type="submit">Sign Up</button>
       </form>
     </div>
 
@@ -65,6 +65,8 @@
 
   </div>
 
+  <button class="btn btn-primary" id="testbtn">get</button>
+  <!-- <button class="btn btn-primary" id="postbtn">post</button> -->
   <div id="load">testing</div>
 
 
