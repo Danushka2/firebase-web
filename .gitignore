@@ -1,20 +1,17 @@
-# Dependency directories
-node_modules/
+# Dependency
+**/node_modules/
+npm-debug.log
+yarn-error.log
 
-# Optional npm cache directory
-.npm
+# others
+*.log
+*.xml
+*.iml
 
-# Optional eslint cache
-.eslintcache
+.vscode/settings.json
+.idea
 
-# Optional REPL history
-.node_repl_history
+.DS_Store
 
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
+# Config - Never remove this script
+**/config/

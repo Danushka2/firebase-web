@@ -1,69 +1,89 @@
-const http = require('http');
-const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json");
-
+const express = require('express');
+const db = require("./firebase-config");
+const path = require('path');
+const app = express();
 
 //---------------------------------------------------------------------------------------
 
 
 
-try {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://testing-708e2.firebaseio.com"
-  });
-} catch (e) {
-  console.error(e);
-}
-
-
-const db = admin.firestore();
-
-
-
 //----------------------------------------------------------------------------
-const hostname = '127.0.0.1';
-const port = 3000;
+app.use(express.static('public'));
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-
-  var url = req.url;
-  if (url === '/') {
-    res.write(' Welcome Everyone');
-    res.end();
-  } else if (url === '/home') {
-    res.write(' Welcome to home page');
-    res.end();
-  } else if (url === '/save') {
-    res.write(' save users');
-    res.end();
-  } else if (url === '/users') {
-
-    db.collection('users').get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          console.log(doc.id, '=>', doc.data());
-        });
-      })
-      .catch((err) => {
-        console.log('Error getting documents', err);
-      });
-
-
-    res.write(' show users ');
-    res.end();
-  } else {
-    res.write('404!');
-    res.end();
-  }
-
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PATCH, DELETE, OPTIONS"
+  );
+  next();
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.get('/', (req,res) => {                                                     //обработка метода GET
+  res.sendFile(path.resolve("./public/index.html"));
 });
+
+app.get('/users', (req,res) =>{
+  db.collection('users').get()
+  .then((snapshot) => {
+    snapshot.forEach((doc) => {
+      console.log(doc.id, '=>', doc.data());
+    });
+  })
+  .catch((err) => {
+    console.log('Error getting documents', err);
+  });
+});
+
+
+
+
+module.exports = app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -71,7 +91,15 @@ server.listen(port, hostname, () => {
 
 //-----------------------------------------------------------------------------
 
-
+// db.collection('users').get()
+//   .then((snapshot) => {
+//     snapshot.forEach((doc) => {
+//       console.log(doc.id, '=>', doc.data());
+//     });
+//   })
+//   .catch((err) => {
+//     console.log('Error getting documents', err);
+//   });
 
 
 
