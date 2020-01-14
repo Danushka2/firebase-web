@@ -24,6 +24,10 @@ app.get('/', (req, res) => {                                                    
   res.sendFile(path.resolve("./public/index.html"));
 });
 
+app.get('/dashboard', (req, res) => {                                                     //обработка метода GET
+  res.sendFile(path.resolve("./public/dashboard.html"));
+});
+
 app.get('/users', (req, res) => {
   let users = [];
   db.collection('users').get()
@@ -64,6 +68,28 @@ app.post('/users', function (req, res) {
 
 });
 
+app.post('/login', function (req, res) {
+
+  let dbDoc = req.body.emailL;
+  let docRef = db.collection('users').doc(dbDoc);
+
+  let getDoc = docRef.get()
+  .then(user => {
+    if (!user.exists) {
+      console.log('No such document!');
+    } else {
+      console.log('Document data:', user.data());
+      if(req.body.passwordL == user.data().password){
+        console.log("Password matched");
+        res.redirect('/dashboard');
+      }
+    }
+  })
+  .catch(err => {
+    console.log('Error getting document', err);
+  });
+
+});
 
 
 
