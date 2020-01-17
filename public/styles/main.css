@@ -223,3 +223,13 @@ input {
 	height: 40px;
 	width: 40px;
 }
+
+.users-info{
+	position: absolute;
+	top: 20px;
+	left: 20px;
+}
+
+.users-info p{
+	line-height: 2px;
+}

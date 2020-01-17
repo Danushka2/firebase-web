@@ -26,19 +26,3 @@ $('#testbtn').click(function(){
         }
     });
 });
-
-
-// $('#postbtn').click(function(){
-// 	$.ajax({
-//         url: "/users/save",
-//         type: "POST",
-//         dataType: "json",
-//         success: function (data) {
-//             console.log(data);
-//             $(data.users).each(function (index) {
-//                 var arr = data.users[index];
-//                 $('#load').append('<p>name: ' + arr.name + '<br></p>')
-//             });
-//         }
-//     });
-// });
