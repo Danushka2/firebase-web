@@ -1,11 +1,36 @@
 const express = require('express');
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const session = require('express-session');
 const db = require("./firebase-config");
 const path = require('path');
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
+
+
+// var sess = {
+//   secret: 'Fuck politics',
+//   cookie: {},
+//   resave: false,
+//   saveUninitialized: true
+// }
+
+// if (app.get('env') === 'production') {
+//   // Use secure cookies in production (requires SSL/TLS)
+//   sess.cookie.secure = true;
+
+//   // Uncomment the line below if your application is behind a proxy (like on Heroku)
+//   // or if you're encountering the error message:
+//   // "Unable to verify authorization request state"
+//   // app.set('trust proxy', 1);
+// }
+
+// app.use(session(sess));
+
+
+
+
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -20,11 +45,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => {                                                     //обработка метода GET
+app.get('/', (req, res) => {                             
   res.sendFile(path.resolve("./public/index.html"));
 });
 
-app.get('/dashboard', (req, res) => {                                                     //обработка метода GET
+app.get('/dashboard', (req, res) => {                   
   res.sendFile(path.resolve("./public/dashboard.html"));
 });
 
@@ -54,7 +79,6 @@ app.post('/users', function (req, res) {
 
   let dbDoc = req.body.emailF;
   let docRef = db.collection('users').doc(dbDoc);
-  //let docRef = db.doc("users/Dan2")
 
   let setAda = docRef.set({
     name: req.body.nameF,
