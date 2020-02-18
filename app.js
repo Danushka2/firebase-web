@@ -9,6 +9,7 @@ const app = express();
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var username;
+var loginErr;
 dotenv.config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -76,7 +77,7 @@ app.use((req, res, next) => {
 
 
 app.get('/', function (req, res) {
-  res.render('index');
+  res.render('index', { loginErr: loginErr });
 });
 
 
@@ -88,10 +89,13 @@ app.get('/dashboard', ensureAuthenticated, async function (req, res) {
       .then(user => {
         if (!user.exists) {
           console.log('No such document!');
+          loginErr = "Not a User.Please Sign Up!";
+          res.redirect("/");
         }
         else {
           if (user.data().password == req.user.id) {
             console.log("Password matched");
+            loginErr = "";
             username = user.data().name;
             res.render('dashboard', { user: username });
           }

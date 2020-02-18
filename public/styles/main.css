@@ -233,3 +233,7 @@ input {
 .users-info p{
 	line-height: 2px;
 }
+
+.login-error{
+	color: #FF416C;
+}
