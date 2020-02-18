@@ -6,6 +6,7 @@ const passport = require('passport');
 const app = express();
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 
 dotenv.config();
 
@@ -65,5 +66,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/', indexRouter);
+app.use('/', usersRouter);
 
 module.exports = app;
