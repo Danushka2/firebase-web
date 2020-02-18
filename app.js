@@ -26,12 +26,11 @@ var sess = {
 };
 
 if (app.get('env') === 'production') {
-  sess.cookie.secure = true; // serve secure cookies, requires https
+  sess.cookie.secure = true;
 }
 
 app.use(session(sess));
 
-//----------------------------------------------------------------------
 passport.serializeUser(function (user, done) {
   // done(null, user.id);
   done(null, user);
@@ -42,24 +41,17 @@ passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
-//------------------------------------------------------------------------
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "http://127.0.0.1:3000/auth/google/callback"
 }, function (accessToken, refreshToken, profile, done) {
-  // console.log("3");
-  // console.log(profile.displayName);
-  // console.log(profile.emails[0].value);
-  // console.log(profile.id);
   return done(null, profile);
 }
 ));
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-//-------------------------------------------------------------------------------------
 
 
 app.use((req, res, next) => {
@@ -89,8 +81,19 @@ app.get('/dashboard', ensureAuthenticated, async function (req, res) {
       .then(user => {
         if (!user.exists) {
           console.log('No such document!');
-          loginErr = "Not a User.Please Sign Up!";
-          res.redirect("/");
+
+          let dbDoc = req.user.emails[0].value;
+          let docRef = db.collection('users').doc(dbDoc);
+
+          let setAda = docRef.set({
+            name: req.user.displayName,
+            password: req.user.id
+          }).then(function () {
+            console.log("saved");
+            res.render('dashboard', { user: req.user.displayName});
+          }).catch(function (error) {
+            console.log(error);
+          });
         }
         else {
           if (user.data().password == req.user.id) {
@@ -104,39 +107,14 @@ app.get('/dashboard', ensureAuthenticated, async function (req, res) {
       .catch(err => {
         console.log('Error getting document', err);
       });
-      
-  }else if(username != undefined){
+
+  } else if (username != undefined) {
     res.render('dashboard', { user: username });
-  }else{
+  } else {
     res.redirect("/");
   }
 
-
-
-  // if (username == undefined) {
-  //   res.redirect("/");
-  // } else {
-  //   res.render('dashboard', { user: username });
-  // }
-
-
-
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 app.get('/auth/google', passport.authenticate('google', {
@@ -148,7 +126,6 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   failureRedirect: '/'
 }),
   function (req, res) {
-    console.log("1");
     res.redirect('/dashboard');
   });
 
@@ -219,7 +196,6 @@ function ensureAuthenticated(req, res, next) {
   }
   res.redirect('/');
 }
-
 
 
 module.exports = app;
