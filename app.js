@@ -9,12 +9,12 @@ const app = express();
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var username;
-
 dotenv.config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
+
 
 // config express-session
 var sess = {
@@ -29,6 +29,7 @@ if (app.get('env') === 'production') {
 }
 
 app.use(session(sess));
+
 //----------------------------------------------------------------------
 passport.serializeUser(function (user, done) {
   // done(null, user.id);
@@ -39,39 +40,19 @@ passport.deserializeUser(function (obj, done) {
   // Users.findById(obj, done);
   done(null, obj);
 });
+
 //------------------------------------------------------------------------
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "http://127.0.0.1:3000/auth/google/callback"
-},
-  function (accessToken, refreshToken, profile, done) {
-    console.log(profile.displayName);
-    console.log(profile.emails[0].value);
-    console.log(profile.id);
-
-    let dbDoc = profile.emails[0].value;
-    let docRef = db.collection('users').doc(dbDoc);
-
-    let getDoc = docRef.get()
-      .then(user => {
-        if (!user.exists) {
-          console.log('No such document!');
-          return done(null, user);
-        } else {
-          if (user.data().password == profile.id) {
-            console.log("Password matched");
-            username = user.data().name;
-            return done(null, user);
-          }
-        }
-      })
-      .catch(err => {
-        console.log('Error getting document', err);
-      });
-
-      return done(null, profile);
-  }
+}, function (accessToken, refreshToken, profile, done) {
+  // console.log("3");
+  // console.log(profile.displayName);
+  // console.log(profile.emails[0].value);
+  // console.log(profile.id);
+  return done(null, profile);
+}
 ));
 
 app.use(passport.initialize());
@@ -93,31 +74,80 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.get('/', function (req, res) {
   res.render('index');
 });
 
-app.get('/dashboard', ensureAuthenticated, function (req, res) {
-  console.log(username);
 
-  if(username==undefined){
-    res.redirect('/');
-  }else{
+app.get('/dashboard', ensureAuthenticated, async function (req, res) {
+  if (username == undefined && req.user != undefined) {
+    let dbDoc = req.user.emails[0].value;
+    let docRef = db.collection('users').doc(dbDoc);
+    let getDoc = docRef.get()
+      .then(user => {
+        if (!user.exists) {
+          console.log('No such document!');
+        }
+        else {
+          if (user.data().password == req.user.id) {
+            console.log("Password matched");
+            username = user.data().name;
+            res.render('dashboard', { user: username });
+          }
+        }
+      })
+      .catch(err => {
+        console.log('Error getting document', err);
+      });
+      
+  }else if(username != undefined){
     res.render('dashboard', { user: username });
+  }else{
+    res.redirect("/");
   }
 
+
+
+  // if (username == undefined) {
+  //   res.redirect("/");
+  // } else {
+  //   res.render('dashboard', { user: username });
+  // }
+
+
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get('/auth/google', passport.authenticate('google', {
   scope: ['openid email profile']
 }));
 
+
 app.get('/auth/google/callback', passport.authenticate('google', {
   failureRedirect: '/'
 }),
   function (req, res) {
+    console.log("1");
     res.redirect('/dashboard');
   });
+
 
 app.get('/users', (req, res) => {
   let users = [];
@@ -126,8 +156,6 @@ app.get('/users', (req, res) => {
       snapshot.forEach((doc) => {
         users.push(doc.data());
       });
-      console.log(users);
-
       res.status(200).json({
         message: 'Post fetched successfully!',
         users: users
@@ -137,12 +165,10 @@ app.get('/users', (req, res) => {
     .catch((err) => {
       console.log('Error getting documents', err);
     });
-
 });
 
 
 app.post('/users', function (req, res) {
-
   let dbDoc = req.body.emailF;
   let docRef = db.collection('users').doc(dbDoc);
 
@@ -155,11 +181,10 @@ app.post('/users', function (req, res) {
   }).catch(function (error) {
     console.log(error);
   });
-
 });
 
-app.post('/login', function (req, res) {
 
+app.post('/login', function (req, res) {
   let dbDoc = req.body.emailL;
   let docRef = db.collection('users').doc(dbDoc);
 
@@ -178,22 +203,19 @@ app.post('/login', function (req, res) {
     .catch(err => {
       console.log('Error getting document', err);
     });
-
 });
 
 
-
-
 function ensureAuthenticated(req, res, next) {
+  if (username != undefined) {
+    return next();
+  }
   if (req.isAuthenticated()) {
     return next();
   }
   res.redirect('/');
 }
 
+
+
 module.exports = app;
-
-
-
-
-

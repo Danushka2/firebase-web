@@ -1,10 +1,13 @@
+const dotenv = require('dotenv');
 const admin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey.json");
+
+dotenv.config();
 
 try {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
-      databaseURL: "https://testing-708e2.firebaseio.com"
+      databaseURL: process.env.FIREBASE_DATABASE_URL
     });
   } catch (e) {
     console.error(e);
