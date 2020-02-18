@@ -15,7 +15,6 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 
-// config express-session
 var sess = {
   secret: 'fuck it',
   cookie: {},
