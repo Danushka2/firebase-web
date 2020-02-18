@@ -7,6 +7,7 @@ const db = require("./firebase-config");
 const path = require('path');
 const app = express();
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const indexRouter = require('./routes/index');
 
 var username;
 var loginErr;
@@ -51,8 +52,8 @@ passport.use(new GoogleStrategy({
 ));
 
 app.use(passport.initialize());
-app.use(passport.session());
 
+app.use(passport.session());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -67,11 +68,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', indexRouter);
 
-app.get('/', function (req, res) {
-  res.render('index', { loginErr: loginErr });
-});
-
+// app.get('/', function (req, res) {
+//   res.render('index', { loginErr: loginErr });
+// });
 
 app.get('/dashboard', ensureAuthenticated, async function (req, res) {
   if (username == undefined && req.user != undefined) {
@@ -196,6 +197,5 @@ function ensureAuthenticated(req, res, next) {
   }
   res.redirect('/');
 }
-
 
 module.exports = app;
